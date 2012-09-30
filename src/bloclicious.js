@@ -1,9 +1,7 @@
 /*
-# bloclicious: beautiful blockly
-
-## LICENSE
 Copyright 2012 Nicholas Bollweg
-https://github.com/bollwyvl/blockd3
+
+https://github.com/bollwyvl/bloclicious
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,40 +14,6 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-
-## MOTIVATION
-Blockly is great, but kind of ponderous to extend, putting the "Java" back 
-into "JavaScript." Let us have an alternative form. How about a more  
-pythonic/d3/underscore-like API?
-
-    var wiki = "https://github.com/mbostock/d3/wiki/",
-        doc = {
-            selections: wiki + "Selections#wiki-%(name)s",
-        };
-
-    // set up a base configuration
-    var bls = bloclicious()
-            .generate('JavaScript')
-            .help_url_prefix(wiki)
-            .namespace('d3_'),
-        // make a subconfiguration
-        sel = bls
-            .help_url_pattern(doc.selections)
-            .category('d3 Selection')
-            .color("red");
-
-    // make a block
-    sel.block("d3_select")
-        .output(Selection)
-        .tooltip('The first element that matches the selector')
-        .title(
-            'select',
-            {"TEXT": }
-        )
-        .atomic("d3.select('%(text)')")
-    
-    // close it off
-    sel.allDone();
 */
  
 (function(){
