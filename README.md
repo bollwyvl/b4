@@ -1,4 +1,4 @@
-# bloclicious
+# b4: beatiful blockly block builder
 A [d3](http://d3js.org/)-style API for building new [Blockly](http://code.google.com/p/blockly/) 
 blocks.
 
@@ -22,7 +22,7 @@ var wiki = "https://github.com/mbostock/d3/wiki/",
     };
 
 // set up a base configuration
-var bls = bloclicious()
+var bls = b4.mold()
         .generate('JavaScript')
         .help_url_prefix(wiki)
         .namespace('d3_'),
@@ -36,9 +36,11 @@ var bls = bloclicious()
 sel.block("d3_select")
     .output(Selection)
     .tooltip('The first element that matches the selector')
+    .title('select')
     .title(
-        'select',
-        {"TEXT": }
+        b3.input()
+          .name("FOO")
+          .type(b3.string)
     )
     .atomic("d3.select('%(text)')")
 
