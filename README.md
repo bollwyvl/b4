@@ -24,11 +24,11 @@ var wiki = "https://github.com/mbostock/d3/wiki/",
 // set up a base configuration
 var bls = b4.mold()
         .generate('JavaScript')
-        .help_url_prefix(wiki)
+        .helpUrlPattern(wiki)
         .namespace('d3_'),
-    // make a subconfiguration
-    sel = bls
-        .help_url_pattern(doc.selections)
+    // make a subconfiguration, but don't bring the blocks!
+    sel = bls.copy()
+        .helpUrlPattern(doc.selections)
         .category('d3 Selection')
         .color("red");
 
