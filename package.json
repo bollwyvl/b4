@@ -1,5 +1,5 @@
 {
-  "name": "bloclicious",
+  "name": "b4",
   "version": "0.1",
   "description": "a d3-style api for building new Blockly blocks",
   "keywords": [
@@ -27,5 +27,7 @@
   },
   "scripts": {
     "test": "./node_modules/vows/bin/vows"
+  },
+  "blocks": {
   }
 }

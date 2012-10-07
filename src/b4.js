@@ -60,7 +60,7 @@ b4.mold = function(){
     var _generator,
         _help_url_pattern,
         _namespace,
-        _language,
+        _language = Blockly.Language,
         _colour,
         _category,
         _blocks = {},
@@ -344,6 +344,19 @@ b4.block = function(value){
     };
 
     /*
+        Add something to the title row
+        
+        Otherwise, list the titles
+    */
+    block.appendTitle = function(value){
+        _titles.push({
+            value: value,
+            var_name: var_name
+        });
+        return block;
+    };
+
+    /*
     whether inputs should be displayed inline
     */
     block.inputsInline = function(value){
@@ -378,8 +391,7 @@ b4.block = function(value){
             inputsInline: block.inputsInline(),
         }
         
-        Blockly.Language[full_name] = {
-        //mold.language()[full_name] = {
+        mold.language()[full_name] = {
             category: block.category(),
             helpUrl: block.helpUrl(),
             init: function(){

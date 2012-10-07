@@ -36,6 +36,9 @@ function run(){
     ]).map(function(prop){
         console.log(prop, ">>>", test_block1[prop](), test_block2[prop]())
     })
+    
+    test_block1.done();
+    test_block2.done();
 }
 
-run()
+run();

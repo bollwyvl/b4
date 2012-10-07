@@ -36,8 +36,8 @@ var bls = b4.mold()
 sel.block("d3_select")
     .output(Selection)
     .tooltip('The first element that matches the selector')
-    .title('select')
-    .title(
+    .appendTitle('select')
+    .appendTitle(
         b3.input()
           .name("FOO")
           .type(b3.string)
