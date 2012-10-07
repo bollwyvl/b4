@@ -16,11 +16,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
  
-(function(Blockly){
-/*
-    probably `document`: don't think this would do anything on the server!
-*/
-var root = this;
+(function (Blockly) {
 
 /*
     built-in types
@@ -56,51 +52,51 @@ instead of incrementally building up all of the bits, wait until the
 */
 b4.block = function(value){
     var my = {
-			_parent: undefined,
-	        _id: undefined,
-	        _namespace: undefined,
-			_language: undefined,
-			_generator: undefined,
-	        _category: undefined,
-	        _help_url_template: undefined,
-	        _help_url: undefined,
-	        _tooltip: undefined,
-	        _output: undefined,
-	        _colour: undefined,
-	        _previous_statement: undefined,
-	        _next_statement: undefined,
-	        _inline: undefined,
-	        _titles: undefined,
-			_blocks: undefined
-		},
+            _parent: undefined,
+            _id: undefined,
+            _namespace: undefined,
+            _language: undefined,
+            _generator: undefined,
+            _category: undefined,
+            _help_url_template: undefined,
+            _help_url: undefined,
+            _tooltip: undefined,
+            _output: undefined,
+            _colour: undefined,
+            _previous_statement: undefined,
+            _next_statement: undefined,
+            _inline: undefined,
+            _titles: undefined,
+            _blocks: undefined
+        },
         block = function(){};
     
     /*
     common task of inheriting value from parent
     */
-	
+    
     function _inherit(var_name, api_name, setter_callback){
-		block[api_name] = function(value){
-			if(undef(value)){
-				if(undef(my[var_name])){
-					if(undef(my._parent)){
-						return undefined;
-					}else{
-						return my._parent[api_name]();
-					}
-				}else{
-					return my[var_name];
-				}
-			}else{
-				if(undef(setter_callback)){
-					my[var_name] = value;
-					return block;
-				}else{
-					var ret = setter_callback(value);
-					return undef(ret) ? block : ret;
-				}
-			}
-		}
+        block[api_name] = function(value){
+            if(undef(value)){
+                if(undef(my[var_name])){
+                    if(undef(my._parent)){
+                        return undefined;
+                    }else{
+                        return my._parent[api_name]();
+                    }
+                }else{
+                    return my[var_name];
+                }
+            }else{
+                if(undef(setter_callback)){
+                    my[var_name] = value;
+                    return block;
+                }else{
+                    var ret = setter_callback(value);
+                    return undef(ret) ? block : ret;
+                }
+            }
+        };
     }
     
     /*
@@ -120,7 +116,7 @@ b4.block = function(value){
         if(undef(value)) return my._parent;
         my._parent = value;
         return block;
-    }
+    };
     
     /*
     where the block will be installed in the global (arg!) namespace
@@ -129,10 +125,10 @@ b4.block = function(value){
     */
     block.id = function(value){
         if(undef(value)){
-        	return undef(my._id) ? block : my._id;
-		}
-		
-		my._id = value;
+            return undef(my._id) ? block : my._id;
+        }
+        
+        my._id = value;
         return block;
     };
     
@@ -145,8 +141,8 @@ b4.block = function(value){
     - Python
     - Dart
     */
-	_inherit("_generator", "generator");
-	
+    _inherit("_generator", "generator");
+    
     /* 
     the internationalized blockly block builder
     
@@ -158,48 +154,48 @@ b4.block = function(value){
     
     TODO: how do you specify more than one of these bad boys? magic paths FAIL
     */
-	_inherit("_language", "language");
-	
+    _inherit("_language", "language");
+    
     /*
     the namespace into which this block should be installed... you'll 
     probably want to set this on the configuration...
     */
-	_inherit("_namespace", "namespace");
+    _inherit("_namespace", "namespace");
     
     /*
     the display category
     */
-	_inherit("_category", "category");
+    _inherit("_category", "category");
     
     /*
     the help url template, following [underscore.template][tmpl] convention
     
     [tmpl]: http://documentcloud.github.com/underscore/#template
     */
-	_inherit("_help_url_template", "helpUrlTemplate");
+    _inherit("_help_url_template", "helpUrlTemplate");
     
     /*
     the help url. If not specified explicitly, will use the template 
     from the configuration.
     */
     block.helpUrl = function(value){
-		var tmpl;
-		if(undef(value)){
+        var tmpl;
+        if(undef(value)){
             if(!undef(my._help_url)){
-				return my._help_url;
-			}else{
-				tmpl = block.helpUrlTemplate();
-				return _.template(tmpl || "", block, {"variable": "block"});
-			}
+                return my._help_url;
+            }else{
+                tmpl = block.helpUrlTemplate();
+                return _.template(tmpl || "", block, {"variable": "block"});
+            }
         }
         my._help_url = value;
-		return my._help_url;
+        return my._help_url;
     };
 
     /*
     set the mouseover tooltip
     */
-	_inherit("_tooltip", "tooltip");
+    _inherit("_tooltip", "tooltip");
     
     /*
     set the output for a block. 
@@ -219,21 +215,21 @@ b4.block = function(value){
     
     Also, see convenience methods.
     */
-	_inherit("_output", "output");
+    _inherit("_output", "output");
     
     /*
     the color currently being used for new blocks
     */
 
-	_inherit("_colour", "colour", function(value){
-		if(_.isNumber(value)){
+    _inherit("_colour", "colour", function(value){
+        if(_.isNumber(value)){
             // accept Hue as `Number`...
             my._colour = value;
         }else{
             // ...or any CSS value
             my._colour = Color(value).hue();
         }
-	});
+    });
     
     /*
     whether the statement has a notch above for a previous statement.
@@ -250,7 +246,7 @@ b4.block = function(value){
     TODO: I think this accepts lists?
     */
 
-	_inherit("_previous_statement", "previousStatement");
+    _inherit("_previous_statement", "previousStatement");
     
     /*
     whether the statement has a notch below for a next statement.
@@ -264,29 +260,29 @@ b4.block = function(value){
     
     TODO: I think this accepts lists?
     */
-	_inherit("_next_statement", "nextStatement");
+    _inherit("_next_statement", "nextStatement");
 
-	block.title = function(value){
-		// getter
-		if(undef(value)){
-			// no parent
-			if(undef(my._parent)){
-				return undef(my._title) ? [] : my._title;
-			//with parent
-			}else{
-				// this is probably not right
-				var title_list = my._parent.title().slice();
-				if(!undef(my._title)){
-					title_list = title_list.concat(my._title);
-				}
-				return title_list;
-			}
-		// setter
-		}else{
-			my._title = value;
-			return block;
-		}
-	};
+    block.title = function(value){
+        // getter
+        if(undef(value)){
+            // no parent
+            if(undef(my._parent)){
+                return undef(my._title) ? [] : my._title;
+            //with parent
+            }else{
+                // this is probably not right
+                var title_list = my._parent.title().slice();
+                if(!undef(my._title)){
+                    title_list = title_list.concat(my._title);
+                }
+                return title_list;
+            }
+        // setter
+        }else{
+            my._title = value;
+            return block;
+        }
+    };
 
     /*
         Add something to the title row
@@ -304,7 +300,7 @@ b4.block = function(value){
     /*
     whether inputs should be displayed inline
     */
-	_inherit("_inline", "inputsInline");
+    _inherit("_inline", "inputsInline");
     
     /*
     write the block to the generator and language!
@@ -316,8 +312,10 @@ b4.block = function(value){
     */
     block.done = function(){
         // everyone use this namespaced-name
-        var full_name = (block.namespace() ? block.namespace() : "") 
-            + block.id();
+        var full_name = [
+			block.namespace() ? block.namespace() : "",
+			block.id()
+		].join("");
     
         /*
             set up language definition out in this scope, so that they 
@@ -329,10 +327,10 @@ b4.block = function(value){
             setOutput: block.output(),
             setPreviousStatement: block.previousStatement(),
             setNextStatement: block.nextStatement(),
-            inputsInline: block.inputsInline(),
-        }
+            inputsInline: block.inputsInline()
+        };
         
-		Blockly.Language[full_name] = {
+        Blockly.Language[full_name] = {
             category: block.category(),
             helpUrl: block.helpUrl(),
             init: function(){
@@ -345,9 +343,11 @@ b4.block = function(value){
                         case "setPreviousStatement":
                         case "setNextStatement":
                             if(val !== true && val !== false){
-                                that[func](true, val); break;
+                                that[func](true, val);
+								break;
                             }
-                        default: that[func](val);
+                        default:
+							that[func](val);
                     }
                 });
             }
@@ -356,14 +356,14 @@ b4.block = function(value){
         // this is the trickiest bit, to avoid scope leakage
         Blockly.Generator.get(block.generator())[full_name] = function(){
             return [code, order];
-        }
+        };
     
         return block;
     };
     
     // this is the end
     return block.id(value);
-}
+};
 
 // install it!
 root.b4 = b4;
