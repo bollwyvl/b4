@@ -313,9 +313,9 @@ b4.block = function(value){
     block.done = function(){
         // everyone use this namespaced-name
         var full_name = [
-			block.namespace() ? block.namespace() : "",
-			block.id()
-		].join("");
+            block.namespace() ? block.namespace() : "",
+            block.id()
+        ].join("");
     
         /*
             set up language definition out in this scope, so that they 
@@ -344,10 +344,10 @@ b4.block = function(value){
                         case "setNextStatement":
                             if(val !== true && val !== false){
                                 that[func](true, val);
-								break;
+                                break;
                             }
                         default:
-							that[func](val);
+                            that[func](val);
                     }
                 });
             }
