@@ -1,27 +1,12 @@
-
-        
-
-
-        
-
-
-    
-
-
-
-
-    
-
-
-
-    
+/*
+Stuff extracted from b4.block and not yet integrated
+*/
     /* 
         create a new block, taking the above configuration into account
         
         instead of incrementally building up all of the bits, wait until the 
         `done()` is called.
     */
-    var block = bls.block = function(value){
         /*
             `value` gets used all the way at the bottom!
         */
@@ -30,64 +15,6 @@
             return blk;
         };
         
-
-        
-
-        
-        /*
-            convenience output methods for built-in types.
-            
-            if no value provided, returns whether the output is allowed.
-        */
-        _.map(blockly_types, function(type_name){
-            blk["output"+type_name] = function(value){
-                if(_.isUndefined(value)){
-                    if(_.isArray(_output)){
-                       return _.contains(_output, type_name);
-                    }else{
-                        return _output === true || _output === type_name;
-                    }
-                }
-                if(value){
-                    _output = type_name;
-                }
-                return blk;
-            };
-        });
-        
-
-            
-
-            
-
-            
-        var _statements,
-            statements = blk.statements = function(prv, nxt){
-                if(_.isUndefined(prv)){ return [
-                    _previous_statement, _next_statement
-                ]; }
-                _previous_statement = prv;
-                _next_statement = nxt;
-            };
-        
-        /*
-            The list of inputs
-        */    
-        var _titles = [];
-        
-        /*
-            Add something to the title row
-            
-            Otherwise, list the titles
-        */
-        var appendTitle = blk.appendTitle = function(value, var_name){
-            if(_.isUndefined(value)){ return _titles; }
-            _titles.push({
-                value: value,
-                var_name: var_name
-            });
-            return blk;
-        };
         
 
         
@@ -172,5 +99,3 @@
         /*
             Woo! Scopetastic! `value` is from way up there!
         */
-        return blk(value);
-    }

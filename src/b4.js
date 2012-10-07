@@ -36,36 +36,106 @@ var blockly_input_types = {
 };
 
 /*
+convenience functions
+*/
+function undef(value){
+    return _.isUndefined(value);
+}
+
+/*
     global namespace
 */
 var b4 = function(){ return b4; };
 
 
-/*
-    Holds all of the goodies for this specific configuration.
+/* 
+create a new block, taking the above configuration into account
 
-    It seems like we may need to do some copies when things happen. 
-    For example, if I...
-
-    - set the `category`
-    - make a bunch of blocks
-    - change the `category`
-    - make some more blocks
-    - install everything
-
-    ...then would everything get the second `category`? I think not. 
-    For the time being, `allDone()` will do the job
+instead of incrementally building up all of the bits, wait until the 
+`done()` is called.
 */
-b4.mold = function(){
-    var _generator,
-        _help_url_pattern,
-        _namespace,
-        _language = Blockly.Language,
-        _colour,
-        _category,
-        _blocks = {},
-        // this is the mumbo-jumbo that gives us a fresh scope every time
-        mold = function(){};
+b4.block = function(value){
+    var my = {
+			_parent: undefined,
+	        _id: undefined,
+	        _namespace: undefined,
+			_language: undefined,
+			_generator: undefined,
+	        _category: undefined,
+	        _help_url_template: undefined,
+	        _help_url: undefined,
+	        _tooltip: undefined,
+	        _output: undefined,
+	        _colour: undefined,
+	        _previous_statement: undefined,
+	        _next_statement: undefined,
+	        _inline: undefined,
+	        _titles: undefined,
+			_blocks: undefined
+		},
+        block = function(){};
+    
+    /*
+    common task of inheriting value from parent
+    */
+	
+    function _inherit(var_name, api_name, setter_callback){
+		block[api_name] = function(value){
+			if(undef(value)){
+				if(undef(my[var_name])){
+					if(undef(my._parent)){
+						return undefined;
+					}else{
+						return my._parent[api_name]();
+					}
+				}else{
+					return my[var_name];
+				}
+			}else{
+				if(undef(setter_callback)){
+					my[var_name] = value;
+					return block;
+				}else{
+					var ret = setter_callback(value);
+					return undef(ret) ? block : ret;
+				}
+			}
+		}
+    }
+    
+    /*
+    make a new block from this block, using this block for defaults
+    
+    fills the role of mold
+    */
+    block.clone = function(value){
+        var new_block = b4.block(value);
+        return new_block.parent(block);
+    };
+    
+    /*
+    set this block's parent block
+    */
+    block.parent = function(value){
+        if(undef(value)) return my._parent;
+        my._parent = value;
+        return block;
+    }
+    
+    /*
+    where the block will be installed in the global (arg!) namespace
+    
+    not inherited!
+    */
+    block.id = function(value){
+        if(undef(value)){
+        	return undef(my._id) ? block : my._id;
+		}
+		
+		my._id = value;
+        return block;
+    };
+    
     /* 
     the blockly generator
 
@@ -75,38 +145,8 @@ b4.mold = function(){
     - Python
     - Dart
     */
-    mold.generate = function(value){
-        if(_.isUndefined(value)) return _generator;
-        _generator = value;
-        return mold;
-    };
-
-    /*
-    the help url pattern, following [sprintf][sprintf] convention, using named 
-    arguments. Available named args:
-
-    - `%(id)s`: the block id
-    - `%(ns)s`: the configuration namespace
-
-    [sprintf]: http://www.diveintojavascript.com/projects/javascript-sprintf
-
-    */
-    mold.helpUrlPattern = function(value){
-        if(_.isUndefined(value)) return _help_url_pattern;
-        _help_url_pattern = value;
-        return mold;
-    };
-
-
-    /*
-    the namespace for new blockly blocks
-    */; 
-    mold.namespace = function(value){
-        if(_.isUndefined(value)) return _namespace;
-        _namespace = value;
-        return mold;
-    };
-    
+	_inherit("_generator", "generator");
+	
     /* 
     the internationalized blockly block builder
     
@@ -118,149 +158,48 @@ b4.mold = function(){
     
     TODO: how do you specify more than one of these bad boys? magic paths FAIL
     */
-    mold.language = function(value){
-        if(_.isUndefined(value)) return _language;
-        _language = value;
-        return mold;
-    };
-    
-    /*
-    the category currently being worked in (will be grouped together)
-    */
-    mold.category = function(value){
-        if(_.isUndefined(value)) return _category;
-        _category = value;
-        return mold;
-    };
-    
-        
-    /*
-    the color currently being used for new blocks
-    */
-    mold.colour = function(value){
-        if(_.isUndefined(value)){
-            return _colour;
-        }else if(_.isNumber(value)){
-            // accept Hue as `Number`...
-            _colour = value;
-        }else{
-            // ...or any CSS value
-            _colour = Color(value).hue();
-        }
-        return mold;
-    };
-    
-    /*
-    hold the blocks, so that we can `allDone`, maybe?
-    */
-    mold.blocks = function(value){
-        if(_.isUndefined(value)) return _blocks;
-        _blocks = value;
-        return mold;
-    };
-    
-    mold.block = function(value){
-        if(_.isUndefined(value)){
-            return b4.block.call(mold, "_auto_" + _(_blocks).keys().length);
-        }else if(_.isString(value)){
-            return b4.block.call(mold, value);
-        }else{
-            _blocks[value.id()] = value;
-            return value;
-        }
-    }
-    
-    // this is the end
-    return mold;
-}
-
-/* 
-create a new block, taking the above configuration into account
-
-instead of incrementally building up all of the bits, wait until the 
-`done()` is called.
-*/
-b4.block = function(value){
-    var mold = this,
-        _id,
-        _namespace,
-        _category,
-        _help_url,
-        _tooltip,
-        _output,
-        _colour,
-        _previous_statement,
-        _next_statement,
-        _inline,
-        block = function(){};
-    
-    /*
-    where the block will be installed in the global (arg!) namespace
-    */
-    block.id = function(value){
-        if(_.isUndefined(value)) return _id;
-        if(!_.isUndefined(_id)
-            && mold._blocks[_id]){ delete mold._blocks[_id]; }
-        _id = value;
-        mold.block(block);
-        return block;
-    };
-    
+	_inherit("_language", "language");
+	
     /*
     the namespace into which this block should be installed... you'll 
     probably want to set this on the configuration...
     */
-    block.namespace = function(value){
-        if(_.isUndefined(value)){
-            if(_.isUndefined(_namespace)){
-                return mold.namespace();
-            }
-            return _namespace;
-        }
-        _namespace = value;
-        return block;
-    };
+	_inherit("_namespace", "namespace");
     
     /*
     the display category
     */
-    block.category = function(value){
-        if(_.isUndefined(value)){
-            if(_.isUndefined(_category)){
-                return mold.category();
-            }
-            return _category;
-        }
-        _category = value;
-        return block;
-    };
+	_inherit("_category", "category");
     
     /*
-    the help url. If not specified explicitly, will use the pattern 
+    the help url template, following [underscore.template][tmpl] convention
+    
+    [tmpl]: http://documentcloud.github.com/underscore/#template
+    */
+	_inherit("_help_url_template", "helpUrlTemplate");
+    
+    /*
+    the help url. If not specified explicitly, will use the template 
     from the configuration.
     */
     block.helpUrl = function(value){
-        if(_.isUndefined(value)){
-            if(_.isUndefined(_help_url)){
-                return _.string.sprintf(mold.helpUrlPattern(), {
-                    id: block.id(),
-                    ns: block.namespace(),
-                });
-            }
-            return _help_url;
+		var tmpl;
+		if(undef(value)){
+            if(!undef(my._help_url)){
+				return my._help_url;
+			}else{
+				tmpl = block.helpUrlTemplate();
+				return _.template(tmpl || "", block, {"variable": "block"});
+			}
         }
-        _help_url = value;
-        return block;
+        my._help_url = value;
+		return my._help_url;
     };
 
     /*
     set the mouseover tooltip
     */
-    block.tooltip = function(value){
-        if(_.isUndefined(value)){ return _tooltip; }
-        _tooltip = value;
-        return block;
-    };
+	_inherit("_tooltip", "tooltip");
     
     /*
     set the output for a block. 
@@ -280,30 +219,21 @@ b4.block = function(value){
     
     Also, see convenience methods.
     */
-    block.output = function(value){
-        if(_.isUndefined(value)){ return _output; }
-        _output = value;
-        return block;
-    };
+	_inherit("_output", "output");
     
     /*
     the color currently being used for new blocks
     */
-    block.colour = function(value){
-        if(_.isUndefined(value)){
-            if(_.isUndefined(_colour)){
-                return mold.colour();
-            }
-            return _colour;            
-        }else if(_.isNumber(value)){
+
+	_inherit("_colour", "colour", function(value){
+		if(_.isNumber(value)){
             // accept Hue as `Number`...
-            _colour = value;
+            my._colour = value;
         }else{
             // ...or any CSS value
-            _colour = Color(value).hue();
+            my._colour = Color(value).hue();
         }
-        return block;
-    };
+	});
     
     /*
     whether the statement has a notch above for a previous statement.
@@ -319,11 +249,8 @@ b4.block = function(value){
     
     TODO: I think this accepts lists?
     */
-    block.previousStatement = function(value){
-        if(_.isUndefined(value)){ return _previous_statement; }
-        _previous_statement = value;
-        return block;
-    };
+
+	_inherit("_previous_statement", "previousStatement");
     
     /*
     whether the statement has a notch below for a next statement.
@@ -337,11 +264,29 @@ b4.block = function(value){
     
     TODO: I think this accepts lists?
     */
-    block.nextStatement = function(value){
-        if(_.isUndefined(value)){ return _next_statement; }
-        _next_statement = value;
-        return block;
-    };
+	_inherit("_next_statement", "nextStatement");
+
+	block.title = function(value){
+		// getter
+		if(undef(value)){
+			// no parent
+			if(undef(my._parent)){
+				return undef(my._title) ? [] : my._title;
+			//with parent
+			}else{
+				// this is probably not right
+				var title_list = my._parent.title().slice();
+				if(!undef(my._title)){
+					title_list = title_list.concat(my._title);
+				}
+				return title_list;
+			}
+		// setter
+		}else{
+			my._title = value;
+			return block;
+		}
+	};
 
     /*
         Add something to the title row
@@ -349,7 +294,7 @@ b4.block = function(value){
         Otherwise, list the titles
     */
     block.appendTitle = function(value){
-        _titles.push({
+        my._title.push({
             value: value,
             var_name: var_name
         });
@@ -359,11 +304,7 @@ b4.block = function(value){
     /*
     whether inputs should be displayed inline
     */
-    block.inputsInline = function(value){
-        if(_.isUndefined(value)){ return _inline; }
-        _inline = value;
-        return blk;
-    };
+	_inherit("_inline", "inputsInline");
     
     /*
     write the block to the generator and language!
@@ -391,13 +332,13 @@ b4.block = function(value){
             inputsInline: block.inputsInline(),
         }
         
-        mold.language()[full_name] = {
+		Blockly.Language[full_name] = {
             category: block.category(),
             helpUrl: block.helpUrl(),
             init: function(){
                 var that = this;
                 _.map(cfg, function(val, func){
-                    if(_.isUndefined(val)){ return; }
+                    if(undef(val)){ return; }
                 
                     switch(func){
                         case "setOutput":
@@ -409,19 +350,11 @@ b4.block = function(value){
                         default: that[func](val);
                     }
                 });
-            
-                _.map(_titles, function(title){
-                    if(slot.type == slot_types.TITLE){
-                        this.appendTitle(slot.title);
-                    }else if(slot.type == slot_types.INPUT){
-                    
-                    }
-                })
             }
         };
     
         // this is the trickiest bit, to avoid scope leakage
-        Blockly.Generator.get(mold.generate())[full_name] = function(){
+        Blockly.Generator.get(block.generator())[full_name] = function(){
             return [code, order];
         }
     
