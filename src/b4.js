@@ -25,6 +25,7 @@ var root = this;
 
     TODO: Magic types?
 */
+/*
 var blockly_types = ["String", "Number", "Boolean", "Array"];
 
 var blockly_input_types = {
@@ -32,6 +33,7 @@ var blockly_input_types = {
     "Input": Blockly.INPUT_VALUE,
     "Next": Blockly.NEXT_STATEMENT
 };
+*/
 
 /*
 convenience functions
@@ -68,8 +70,10 @@ b4.block = function(value){
             _previous_statement: undefined,
             _next_statement: undefined,
             _inline: undefined,
-            _titles: undefined,
-            _blocks: undefined
+            _title: undefined,
+            _blocks: undefined,
+            _code: undefined,
+            _code_order: undefined
         },
         block = function(){};
 
@@ -124,10 +128,20 @@ b4.block = function(value){
     where the block will be installed in the global (arg!) namespace
 
     not inherited!
+    
+    prettier id's:
+    
+    d4.ns.d3("d3");
+    
+    d3.select.
+    
     */
     block.id = function(value){
         if(undef(value)){
-            return undef(my._id) ? block : my._id;
+            return [
+                block.namespace() || "",
+                my._id || ""
+            ].join("");
         }
 
         my._id = value;
@@ -187,7 +201,11 @@ b4.block = function(value){
                 return my._help_url;
             }else{
                 tmpl = block.helpUrlTemplate();
-                return _.template(tmpl || "", block, {"variable": "block"});
+                var output = _.template(tmpl || "",
+                    block,
+                    {"variable": "block"}
+                ); 
+                return output;
             }
         }
         my._help_url = value;
@@ -292,11 +310,35 @@ b4.block = function(value){
         Otherwise, list the titles
     */
     block.appendTitle = function(value){
-        my._title.push({
-            value: value,
-            var_name: var_name
-        });
+        if(undef(my._title)){
+            my._title = [];
+        }
+        var new_title = value;
+        // is this a "dumb" value?
+        if(!_.isFunction(value)){
+            new_title = function(blockly_scope){
+                return value;
+            };
+            new_title.id = function(){ return undefined; };
+        }
+        my._title.push(new_title);
         return block;
+    };
+    
+    /*
+    the code that will be executed
+    */
+    _inherit("_code", "code");
+    _inherit("_code_order", "codeOrder");
+    
+    block.generateCode = function(blockly_scope, generator){
+        return [
+            _.template(
+                block.code(),
+                blockly_scope,
+                {"variable": "block"}),
+            block.codeOrder() || generator.ORDER_ATOMIC
+        ]; 
     };
 
     /*
@@ -313,58 +355,100 @@ b4.block = function(value){
     prevent creep of values into way late in the game.
     */
     block.done = function(){
-        // everyone use this namespaced-name
-        var full_name = [
-            block.namespace() ? block.namespace() : "",
-            block.id()
-        ].join("");
-
         /*
             set up language definition out in this scope, so that they
             don't get reevaluated later. that would be sad.
         */
-        var cfg = {
-            setColour: block.colour(),
-            setTooltip: block.tooltip(),
-            setOutput: block.output(),
-            setPreviousStatement: block.previousStatement(),
-            setNextStatement: block.nextStatement(),
-            inputsInline: block.inputsInline()
-        };
-
-        Blockly.Language[full_name] = {
+        var BL = Blockly.Language,
+            blid = block.id(),
+            cfg = {
+                setColour: block.colour(),
+                setTooltip: block.tooltip(),
+                setOutput: block.output(),
+                setPreviousStatement: block.previousStatement(),
+                setNextStatement: block.nextStatement(),
+                inputsInline: block.inputsInline()
+            },
+            title_list = block.title();
+        
+        console.log("ADDING", blid, "to Language ", BL);
+        
+        BL[blid] = {
             category: block.category(),
             helpUrl: block.helpUrl(),
             init: function(){
                 var that = this;
                 _.map(cfg, function(val, func){
                     if(undef(val)){ return; }
-
-                    switch(func){
-                        case "setOutput":
-                        case "setPreviousStatement":
-                        case "setNextStatement":
-                            if(val !== true && val !== false){
-                                that[func](true, val);
-                                break;
-                            }
-                        default:
-                            that[func](val);
+                    
+                    var maybe_bool = _.contains([
+                            "setOutput",
+                            "setPreviousStatement",
+                            "setNextStatement"
+                        ], func);
+                    
+                    if(maybe_bool && (val !== true && val !== false)){
+                        that[func](true, val);
+                    }else{
+                        that[func](val);
                     }
+                });
+                
+                // set up title
+                _.map(title_list, function(title_callback){
+                    var title_item = title_callback();
+                    that.appendTitle(title_item, title_callback.id());
                 });
             }
         };
-
+        
+        console.log("ADDING", blid, "to Generator", BG);
         // this is the trickiest bit, to avoid scope leakage
-        Blockly.Generator.get(block.generator())[full_name] = function(){
-            return [code, order];
+        var BG = Blockly.Generator.get(block.generator());
+        
+        BG[blid] = function(){
+            return block.generateCode(this, BG);
         };
 
         return block;
     };
 
     // this is the end
-    return block.id(value);
+    return block.id(value || "");
+};
+
+/*
+Input superclass
+*/
+b4.field = function(){};
+
+b4.field.text = function(value){
+    var field = function(blockly_scope){
+            return new Blockly.FieldTextInput(field.init());
+        },
+        my = {
+            _init: undefined,
+            _id: undefined
+        };
+    /*
+    field id in this scope (block)
+    */
+    field.id = function(value){
+        if(undef(value)) return my._id;
+        my._id = value;
+        return field;
+    };
+    
+    /*
+    the initial value for a field
+    */
+    field.init = function(value){
+        if(undef(value)) return my._init;
+        my._init = value;
+        return field;
+    };
+    
+    return field.id(value || "");
 };
 
 // install it!
