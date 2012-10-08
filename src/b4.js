@@ -380,13 +380,28 @@ b4.block = function(value){
     _inherit("_code_order", "codeOrder");
     
     block.generateCode = function(blockly_scope, generator){
-        blockly_scope.BG = Blockly.Generator.get(block.generator());
-        blockly_scope.BL = Blockly.Language;
+        var BG = Blockly.Generator.get(block.generator()),
+            BL = Blockly.Language;
+        
+        var fake_block = function(){
+            var flock = function(attr){ return flock; };
+            
+            flock.title = function(value){
+                return blockly_scope.getTitleValue(value);
+            };
+            
+            flock.code = function(value){
+                return BG.valueToCode(blockly_scope, value, block.codeOrder())
+            };
+            
+            return flock;
+        };
+        
         return [
             _.template(
                 block.code(),
-                blockly_scope,
-                {"variable": "block"}),
+                fake_block(),
+                {"variable": "$"}),
             block.codeOrder() || generator.ORDER_ATOMIC
         ]; 
     };
@@ -555,7 +570,7 @@ b4.input = function(value){
     */
     field.nextStatement = function(value){
         if(undef(value)) return my._shape === value;
-        my._shape = my._shape ? my._shape : "NEXT_STATEMENT";
+        my._shape = value ? "NEXT_STATEMENT" : my._shape;
         return field;
     };
     /*
@@ -563,7 +578,7 @@ b4.input = function(value){
     */
     field.inputValue = function(value){
         if(undef(value)) return my._shape === value;
-        my._shapee = my._shape ? my._shape : "INPUT_VALUE";
+        my._shape = value ? "INPUT_VALUE" : my._shape;
         return field;
     };
     /*
@@ -571,7 +586,7 @@ b4.input = function(value){
     */
     field.dummyValue = function(value){
         if(undef(value)) return my._shape === value;
-        my._shape = my._shape ? my._shape : "DUMMY_VALUE";
+        my._shape = value ? "v" : my._shape;
         return field;
     };
 
