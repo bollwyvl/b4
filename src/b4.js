@@ -275,15 +275,18 @@ b4.block = function(value){
         if(undef(my._title)){
             my._title = [];
         }
-        var new_title = value;
-        // is this a "dumb" value?
-        if(!_.isFunction(value)){
-            new_title = function(blockly_scope){
-                return value;
-            };
-            new_title.id = function(){ return undefined; };
-        }
-        my._title.push(new_title);
+        var new_title;
+        _.map(_.isArray(value) ? value : [value], function(value){
+            new_title = value;
+            // is this a "dumb" value?
+            if(!_.isFunction(value)){
+                new_title = function(blockly_scope){
+                    return value;
+                };
+                new_title.id = function(){ return undefined; };
+            }
+            my._title.push(new_title);
+        });
         return block;
     };
     
@@ -314,15 +317,18 @@ b4.block = function(value){
         if(undef(my._input)){
             my._input = [];
         }
-        var new_input = value;
-        // is this a "dumb" value?
-        if(!_.isFunction(value)){
-            new_input = function(blockly_scope){
-                return value;
-            };
-            new_input.id = function(){ return undefined; };
-        }
-        my._input.push(new_input);
+        var new_input;
+        _.map(_.isArray(value) ? value : [value], function(value){
+            new_input = value;
+            // is this a "dumb" value?
+            if(!_.isFunction(value)){
+                new_input = function(blockly_scope){
+                    return value;
+                };
+                new_input.id = function(){ return undefined; };
+            }
+            my._input.push(new_input);
+        });
         return block;
     };
     
@@ -331,7 +337,9 @@ b4.block = function(value){
     
     accepts the current flavor of [template][tmpl].
     */
-    _inherit("_code", "code");
+    _inherit("_code", "code", function(value){
+        my._code = _.isString(value) ? value : value.join("\n\t");
+    });
     
     /*
     the join rules (as of 2012.10.07)
@@ -363,21 +371,21 @@ b4.block = function(value){
     
     block.generateCode = function(blockly_scope, generator){
         var BG = Blockly.Generator.get(block.generator()),
-            BL = Blockly.Language;
-        
-        var fake_block = function(){
-            var flock = function(attr){ return flock; };
+                fake_block = function(){
+                var flock = function(attr){ return flock; };
             
-            flock.title = function(value){
-                return blockly_scope.getTitleValue(value);
+                flock.title = function(value){
+                    return blockly_scope.getTitleValue(value);
+                };
+            
+                flock.code = function(value){
+                    return BG.valueToCode(blockly_scope,
+                        value,
+                        block.codeOrder());
+                };
+            
+                return flock;
             };
-            
-            flock.code = function(value){
-                return BG.valueToCode(blockly_scope, value, block.codeOrder())
-            };
-            
-            return flock;
-        };
         
         return [
             _.template(
@@ -451,7 +459,6 @@ b4.block = function(value){
                 // set up input... probably needs recursion?
                 // this.appendInput('from', Blockly.INPUT_VALUE, 'PARENT', Selection);
                 _.map(input_list, function(input_callback){
-                    var input_item = input_callback();
                     var input = that.appendInput(
                         Blockly[input_callback.shape()],
                         input_callback.id(),
@@ -593,7 +600,7 @@ b4.input = function(value){
     };
     
     return field.id(value || "");
-}
+};
 
 // install it!
 root.b4 = b4;
