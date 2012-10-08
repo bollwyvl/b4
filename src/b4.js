@@ -432,7 +432,8 @@ b4.field = function(){};
 
 b4.field.text = function(value){
     var field = function(blockly_scope){
-            return new Blockly.FieldTextInput(field.init());
+            var _field =  new Blockly.FieldTextInput(field.init());
+            return _field;
         },
         my = {
             _init: undefined,
