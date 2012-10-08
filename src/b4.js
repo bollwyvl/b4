@@ -21,21 +21,6 @@ limitations under the License.
 var root = this;
 
 /*
-    built-in types
-
-    TODO: Magic types?
-*/
-/*
-var blockly_types = ["String", "Number", "Boolean", "Array"];
-
-var blockly_input_types = {
-    "Dummy": Blockly.DUMMY_INPUT,
-    "Input": Blockly.INPUT_VALUE,
-    "Next": Blockly.NEXT_STATEMENT
-};
-*/
-
-/*
 convenience functions
 */
 function undef(value){
@@ -43,10 +28,11 @@ function undef(value){
 }
 
 /*
-    global namespace
+global namespace
 */
 var b4 = function(){ return b4; };
 
+b4.VERSION = "0.1";
 
 /*
 create a new block, taking the above configuration into account
@@ -128,13 +114,6 @@ b4.block = function(value){
     where the block will be installed in the global (arg!) namespace
 
     not inherited!
-    
-    prettier id's:
-    
-    d4.ns.d3("d3");
-    
-    d3.select.
-    
     */
     block.id = function(value){
         if(undef(value)){
@@ -327,8 +306,37 @@ b4.block = function(value){
     
     /*
     the code that will be executed
+    
+    accepts the current flavor of [template][tmpl].
     */
     _inherit("_code", "code");
+    
+    /*
+    the join rules (as of 2012.10.07)
+    
+    Blockly.Python.ORDER_ATOMIC = 0;            // 0 "" ...
+    Blockly.Python.ORDER_COLLECTION = 1;        // tuples, lists, dictionaries
+    Blockly.Python.ORDER_STRING_CONVERSION = 1; // `expression...`
+    Blockly.Python.ORDER_MEMBER = 2;            // . []
+    Blockly.Python.ORDER_FUNCTION_CALL = 2;     // ()
+    Blockly.Python.ORDER_EXPONENTIATION = 3;    // **
+    Blockly.Python.ORDER_UNARY_SIGN = 4;        // + -
+    Blockly.Python.ORDER_BITWISE_NOT = 4;       // ~
+    Blockly.Python.ORDER_MULTIPLICATIVE = 5;    // * / // %
+    Blockly.Python.ORDER_ADDITIVE = 6;          // + -
+    Blockly.Python.ORDER_BITWISE_SHIFT = 7;     // << >>
+    Blockly.Python.ORDER_BITWISE_AND = 8;       // &
+    Blockly.Python.ORDER_BITWISE_XOR = 9;       // ^
+    Blockly.Python.ORDER_BITWISE_OR = 10;       // |
+    Blockly.Python.ORDER_RELATIONAL = 11;       // in, not in, is, is not,
+                                                //     <, <=, >, >=, <>, !=, ==
+    Blockly.Python.ORDER_LOGICAL_NOT = 12;      // not
+    Blockly.Python.ORDER_LOGICAL_AND = 13;      // and
+    Blockly.Python.ORDER_LOGICAL_OR = 14;       // or
+    Blockly.Python.ORDER_CONDITIONAL = 15;      // if else
+    Blockly.Python.ORDER_LAMBDA = 16;           // lambda
+    Blockly.Python.ORDER_NONE = 99;             // (...)
+    */
     _inherit("_code_order", "codeOrder");
     
     block.generateCode = function(blockly_scope, generator){
