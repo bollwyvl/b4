@@ -379,8 +379,6 @@ b4.block = function(value){
             },
             title_list = block.title();
         
-        console.log("ADDING", blid, "to Language ", BL);
-        
         BL[blid] = {
             category: block.category(),
             helpUrl: block.helpUrl(),
@@ -410,7 +408,6 @@ b4.block = function(value){
             }
         };
         
-        console.log("ADDING", blid, "to Generator", BG);
         // this is the trickiest bit, to avoid scope leakage
         var BG = Blockly.Generator.get(block.generator());
         
