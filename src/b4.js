@@ -59,7 +59,8 @@ b4.block = function(value){
             _title: undefined,
             _blocks: undefined,
             _code: undefined,
-            _code_order: undefined
+            _code_order: undefined,
+            _input: undefined
         },
         block = function(){};
 
@@ -304,6 +305,45 @@ b4.block = function(value){
         return block;
     };
     
+    
+    block.input = function(value){
+        // getter
+        if(undef(value)){
+            // no parent
+            if(undef(my._input)){
+                return undef(my._input) ? [] : my._input;
+            //with parent
+            }else{
+                // this is probably not right
+                var input_list = my._parent.input().slice();
+                if(!undef(my._input)){
+                    input_list = input_list.concat(my._input);
+                }
+                return input_list;
+            }
+        // setter
+        }else{
+            my._title = value;
+            return block;
+        }
+    };
+    
+    block.appendInput = function(value){
+        if(undef(my._input)){
+            my._input = [];
+        }
+        var new_input = value;
+        // is this a "dumb" value?
+        if(!_.isFunction(value)){
+            new_input = function(blockly_scope){
+                return value;
+            };
+            new_input.id = function(){ return undefined; };
+        }
+        my._input.push(new_input);
+        return block;
+    };
+    
     /*
     the code that will be executed
     
@@ -340,6 +380,8 @@ b4.block = function(value){
     _inherit("_code_order", "codeOrder");
     
     block.generateCode = function(blockly_scope, generator){
+        blockly_scope.BG = Blockly.Generator.get(block.generator());
+        blockly_scope.BL = Blockly.Language;
         return [
             _.template(
                 block.code(),
@@ -369,16 +411,19 @@ b4.block = function(value){
         */
         var BL = Blockly.Language,
             blid = block.id(),
+            code,
             cfg = {
                 setColour: block.colour(),
                 setTooltip: block.tooltip(),
                 setOutput: block.output(),
                 setPreviousStatement: block.previousStatement(),
                 setNextStatement: block.nextStatement(),
-                inputsInline: block.inputsInline()
+                setInputsInline: block.inputsInline()
             },
-            title_list = block.title();
+            title_list = block.title(),
+            input_list = block.input();
         
+        console.log("language installing", blid);
         BL[blid] = {
             category: block.category(),
             helpUrl: block.helpUrl(),
@@ -405,14 +450,29 @@ b4.block = function(value){
                     var title_item = title_callback();
                     that.appendTitle(title_item, title_callback.id());
                 });
+                
+                // set up input... probably needs recursion?
+                // this.appendInput('from', Blockly.INPUT_VALUE, 'PARENT', Selection);
+                _.map(input_list, function(input_callback){
+                    var input_item = input_callback();
+                    var input = that.appendInput(
+                        Blockly[input_callback.shape()],
+                        input_callback.id(),
+                        input_callback.output()
+                    );
+                    input.appendTitle(input_callback.title());
+                });
+                
             }
         };
         
         // this is the trickiest bit, to avoid scope leakage
         var BG = Blockly.Generator.get(block.generator());
         
+        console.log("generator installing", blid);
         BG[blid] = function(){
-            return block.generateCode(this, BG);
+            code = block.generateCode(this, BG);
+            return code;
         };
 
         return block;
@@ -425,9 +485,13 @@ b4.block = function(value){
 /*
 Input superclass
 */
-b4.field = function(){};
+b4.fields = function(){};
 
-b4.field.text = function(value){
+/*
+    this.appendInput('from', Blockly.INPUT_VALUE, 'PARENT', Selection);
+*/
+
+b4.fields.text = function(value){
     var field = function(blockly_scope){
             var _field =  new Blockly.FieldTextInput(field.init());
             return _field;
@@ -456,6 +520,83 @@ b4.field.text = function(value){
     
     return field.id(value || "");
 };
+
+b4.input = function(value){
+    var field = function(blockly_scope){
+            return field;
+        },
+        my = {
+            _id: undefined,
+            _title: undefined,
+            _output: undefined,
+            _shape: undefined
+        };
+
+    /*
+    field id in this scope (block)
+    */
+    field.id = function(value){
+        if(undef(value)) return my._id;
+        my._id = value;
+        return field;
+    };
+
+    /*
+    field id in this scope (block)
+    */
+    field.shape = function(value){
+        if(undef(value)) return my._shape;
+        my._shape = value;
+        return field;
+    };
+
+    /*
+    field id in this scope (block)
+    */
+    field.nextStatement = function(value){
+        if(undef(value)) return my._shape === value;
+        my._shape = my._shape ? my._shape : "NEXT_STATEMENT";
+        return field;
+    };
+    /*
+    field id in this scope (block)
+    */
+    field.inputValue = function(value){
+        if(undef(value)) return my._shape === value;
+        my._shapee = my._shape ? my._shape : "INPUT_VALUE";
+        return field;
+    };
+    /*
+    field id in this scope (block)
+    */
+    field.dummyValue = function(value){
+        if(undef(value)) return my._shape === value;
+        my._shape = my._shape ? my._shape : "DUMMY_VALUE";
+        return field;
+    };
+
+    /*
+    field id in this scope (block)
+    */
+    field.title = function(value){
+        if(undef(value)) return my._title;
+        my._title = value;
+        return field;
+    };
+    
+
+
+    /*
+    field id in this scope (block)
+    */
+    field.output = function(value){
+        if(undef(value)) return my._output;
+        my._output = value;
+        return field;
+    };
+    
+    return field.id(value || "");
+}
 
 // install it!
 root.b4 = b4;
