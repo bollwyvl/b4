@@ -17,6 +17,11 @@ var b4 = function(){ return b4; };
 b4.VERSION = "0.1";
 
 /*
+namespaced piles of b4 block objects
+*/
+b4.library = b4.library || {};
+
+/*
 create a new block, taking the above configuration into account
 
 instead of incrementally building up all of the bits, wait until the
