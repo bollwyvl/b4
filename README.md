@@ -16,36 +16,28 @@ into "JavaScript." Let us have an alternative form. How about a more
 pythonic/d3/underscore-like API?
 
 ~~~~~~~~~~{.js}
-var wiki = "https://github.com/mbostock/d3/wiki/",
-    doc = {
-        selections: wiki + "Selections#wiki-%(name)s",
-    };
+var D3_WIKI = "https://github.com/mbostock/d3/wiki/";
 
 // set up a base configuration
-var bls = b4.mold()
-        .generate('JavaScript')
-        .helpUrlPattern(wiki)
-        .namespace('d3_'),
-    // make a subconfiguration, but don't bring the blocks!
-    sel = bls.copy()
-        .helpUrlPattern(doc.selections)
-        .category('d3 Selection')
-        .color("red");
-
-// make a block
-sel.block("d3_select")
-    .output(Selection)
-    .tooltip('The first element that matches the selector')
-    .appendTitle('select')
-    .appendTitle(
-        b3.input()
-          .name("FOO")
-          .type(b3.string)
-    )
-    .atomic("d3.select('%(text)')")
-
-// close it off
-sel.allDone();
+var d3_mold = b4.block()
+    .generator("JavaScript")
+    .helpUrlTemplate(D3_WIKI)
+    .namespace("")
+    .colour("steelBlue"),
+            
+    // make a subconfiguration
+    select_mold = d3_mold.clone()
+        .namespace("d3_select")
+        .category("d3 selection")
+        .output(D3_TYPES.SELECTION)
+        .helpUrlTemplate(D3_WIKI +"Selections#wiki-<%= block.id() %>");
+            
+select_mold.clone("")
+    .tooltip("The first element that matches the selector")
+    .appendTitle("select the first element that matches")
+    .appendTitle(D3_TYPES.SELECTION.field)
+    .code("d3.select('<%= $.title('SELECTOR') %>')")
+    .done();
 ~~~~~~~~~~
 
 # roadmap
