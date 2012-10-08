@@ -15,12 +15,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
- 
+
 (function (Blockly) {
+// probably `document`
+var root = this;
 
 /*
     built-in types
-    
+
     TODO: Magic types?
 */
 var blockly_types = ["String", "Number", "Boolean", "Array"];
@@ -44,10 +46,10 @@ function undef(value){
 var b4 = function(){ return b4; };
 
 
-/* 
+/*
 create a new block, taking the above configuration into account
 
-instead of incrementally building up all of the bits, wait until the 
+instead of incrementally building up all of the bits, wait until the
 `done()` is called.
 */
 b4.block = function(value){
@@ -70,11 +72,11 @@ b4.block = function(value){
             _blocks: undefined
         },
         block = function(){};
-    
+
     /*
     common task of inheriting value from parent
     */
-    
+
     function _inherit(var_name, api_name, setter_callback){
         block[api_name] = function(value){
             if(undef(value)){
@@ -98,17 +100,17 @@ b4.block = function(value){
             }
         };
     }
-    
+
     /*
     make a new block from this block, using this block for defaults
-    
+
     fills the role of mold
     */
     block.clone = function(value){
         var new_block = b4.block(value);
         return new_block.parent(block);
     };
-    
+
     /*
     set this block's parent block
     */
@@ -117,22 +119,22 @@ b4.block = function(value){
         my._parent = value;
         return block;
     };
-    
+
     /*
     where the block will be installed in the global (arg!) namespace
-    
+
     not inherited!
     */
     block.id = function(value){
         if(undef(value)){
             return undef(my._id) ? block : my._id;
         }
-        
+
         my._id = value;
         return block;
     };
-    
-    /* 
+
+    /*
     the blockly generator
 
     Set the (computer) language generator. Probably one of:
@@ -142,40 +144,40 @@ b4.block = function(value){
     - Dart
     */
     _inherit("_generator", "generator");
-    
-    /* 
+
+    /*
     the internationalized blockly block builder
-    
+
     Set the (human) language generator. Probably one of:
 
     - en
     - zh
     - de
-    
+
     TODO: how do you specify more than one of these bad boys? magic paths FAIL
     */
     _inherit("_language", "language");
-    
+
     /*
-    the namespace into which this block should be installed... you'll 
+    the namespace into which this block should be installed... you'll
     probably want to set this on the configuration...
     */
     _inherit("_namespace", "namespace");
-    
+
     /*
     the display category
     */
     _inherit("_category", "category");
-    
+
     /*
     the help url template, following [underscore.template][tmpl] convention
-    
+
     [tmpl]: http://documentcloud.github.com/underscore/#template
     */
     _inherit("_help_url_template", "helpUrlTemplate");
-    
+
     /*
-    the help url. If not specified explicitly, will use the template 
+    the help url. If not specified explicitly, will use the template
     from the configuration.
     */
     block.helpUrl = function(value){
@@ -196,27 +198,27 @@ b4.block = function(value){
     set the mouseover tooltip
     */
     _inherit("_tooltip", "tooltip");
-    
+
     /*
-    set the output for a block. 
+    set the output for a block.
     To not specify a type (but demand the output) pass
-    
+
         true
-    
+
     to specify a type, e.g.
-    
+
         "Number"
-    
+
     or a list of types
-    
+
         ["Number", "String"]
-    
+
     If no value provided, returns the list of allowed values.
-    
+
     Also, see convenience methods.
     */
     _inherit("_output", "output");
-    
+
     /*
     the color currently being used for new blocks
     */
@@ -230,34 +232,34 @@ b4.block = function(value){
             my._colour = Color(value).hue();
         }
     });
-    
+
     /*
     whether the statement has a notch above for a previous statement.
-    
+
     provide true just to get the block.
-    
-    provide a list of statement types to limit the blocks to which 
+
+    provide a list of statement types to limit the blocks to which
     this one can be attached
-    
+
     see the convenience function below to set both statements at once
-    
+
     TODO: HOW IS THIS DEFINED?
-    
+
     TODO: I think this accepts lists?
     */
 
     _inherit("_previous_statement", "previousStatement");
-    
+
     /*
     whether the statement has a notch below for a next statement.
-    
-    provide a list of statement types to limit which blocks can 
+
+    provide a list of statement types to limit which blocks can
     connect after this one
-    
+
     see the convenience function below to set both statements at once
-    
+
     TODO: HOW IS THIS DEFINED?
-    
+
     TODO: I think this accepts lists?
     */
     _inherit("_next_statement", "nextStatement");
@@ -286,7 +288,7 @@ b4.block = function(value){
 
     /*
         Add something to the title row
-        
+
         Otherwise, list the titles
     */
     block.appendTitle = function(value){
@@ -301,10 +303,10 @@ b4.block = function(value){
     whether inputs should be displayed inline
     */
     _inherit("_inline", "inputsInline");
-    
+
     /*
     write the block to the generator and language!
-    
+
     NOTE TO SELF:
     be careful to capture all of the scoped bits at time
     of installation, don't evaluate after the fact: this should
@@ -316,9 +318,9 @@ b4.block = function(value){
             block.namespace() ? block.namespace() : "",
             block.id()
         ].join("");
-    
+
         /*
-            set up language definition out in this scope, so that they 
+            set up language definition out in this scope, so that they
             don't get reevaluated later. that would be sad.
         */
         var cfg = {
@@ -329,7 +331,7 @@ b4.block = function(value){
             setNextStatement: block.nextStatement(),
             inputsInline: block.inputsInline()
         };
-        
+
         Blockly.Language[full_name] = {
             category: block.category(),
             helpUrl: block.helpUrl(),
@@ -337,7 +339,7 @@ b4.block = function(value){
                 var that = this;
                 _.map(cfg, function(val, func){
                     if(undef(val)){ return; }
-                
+
                     switch(func){
                         case "setOutput":
                         case "setPreviousStatement":
@@ -352,15 +354,15 @@ b4.block = function(value){
                 });
             }
         };
-    
+
         // this is the trickiest bit, to avoid scope leakage
         Blockly.Generator.get(block.generator())[full_name] = function(){
             return [code, order];
         };
-    
+
         return block;
     };
-    
+
     // this is the end
     return block.id(value);
 };
