@@ -21,6 +21,8 @@ namespaced piles of b4 block objects
 */
 b4.library = b4.library || {};
 
+b4.DEBUG = 0;
+
 /*
 create a new block, taking the above configuration into account
 
@@ -433,7 +435,9 @@ b4.block = function(value){
             title_list = block.title(),
             input_list = block.input();
         
-        console.log("language installing", blid);
+        
+        b4.DEBUG ? console.log("language installing", blid) : "";
+        
         BL[blid] = {
             category: block.category(),
             helpUrl: block.helpUrl(),
@@ -478,7 +482,7 @@ b4.block = function(value){
         // this is the trickiest bit, to avoid scope leakage
         var BG = Blockly.Generator.get(block.generator());
         
-        console.log("generator installing", blid);
+        b4.DEBUG ? console.log("generator installing", blid) : "";
         BG[blid] = function(){
             code = block.generateCode(this, BG);
             return code;
