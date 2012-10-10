@@ -405,13 +405,13 @@ b4.block = function(value){
                         return blockly_scope.getTitleValue(value);
                     };
             
-                    flock.code = function(value){
+                    flock.code = function(value, _default){
                         var code = BG.valueToCode(
                             blockly_scope,
                             value,
                             order
                         );
-                        return code;
+                        return undef(_default) ? code : _default;
                     };
             
                     return flock;
