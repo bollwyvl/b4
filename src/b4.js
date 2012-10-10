@@ -470,7 +470,6 @@ b4.block = function(value){
                 
                 // set up input... probably needs recursion?
                 // this.appendInput('from', Blockly.INPUT_VALUE, 'PARENT', Selection);
-                /*
                 _.map(input_list, function(input_callback){
                     that.appendValueInput(
                         Blockly[input_callback.shape()],
@@ -479,7 +478,6 @@ b4.block = function(value){
                     );
                     input.appendTitle(input_callback.title());
                 });
-                */
                 
             }
         };
@@ -590,7 +588,7 @@ b4.input = function(value){
     */
     field.dummyValue = function(value){
         if(undef(value)) return my._shape === value;
-        my._shape = value ? "v" : my._shape;
+        my._shape = value ? "DUMMY_VALUE" : my._shape;
         return field;
     };
 
