@@ -476,15 +476,17 @@ b4.block = function(value){
                         input_callback.title(),
                         input_callback.output()
                     );
-                    var shape_meth = {
-                                INPUT_VALUE: that.appendValueInput,
-                                DUMMY_VALUE: that.appendDummyInput,
-                                NEXT_STATEMENT: that.appendStatementInput
-                        }[input_callback.shape()],
+                    var output = input_callback.output(),
+                        shape_meth = {
+                                    INPUT_VALUE: that.appendValueInput,
+                                    DUMMY_VALUE: that.appendDummyInput,
+                                    NEXT_STATEMENT: that.appendStatementInput
+                            }[input_callback.shape()],
                         input = shape_meth.call(that, input_callback.id());
-
-                    
-                    //input.appendTitle(input_callback.title());
+                        if(!undef(output)){
+                            input.setCheck(output);
+                        }
+                        input.appendTitle(input_callback.title());
                 });
                 
             }
