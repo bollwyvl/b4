@@ -436,13 +436,15 @@ b4.block = function(value){
             input_list = block.input();
         
         
-        b4.DEBUG ? console.log("language installing", blid) : "";
+        b4.DEBUG || console.log("language installing", blid);
         
         BL[blid] = {
             category: block.category(),
             helpUrl: block.helpUrl(),
             init: function(){
-                var that = this;
+                var that = this,
+                    dummy_input = that.appendDummyInput();
+                    
                 _.map(cfg, function(val, func){
                     if(undef(val)){ return; }
                     
@@ -459,22 +461,25 @@ b4.block = function(value){
                     }
                 });
                 
-                // set up title
+                
                 _.map(title_list, function(title_callback){
                     var title_item = title_callback();
-                    that.appendTitle(title_item, title_callback.id());
+                    dummy_input.appendTitle(title_item);
+                    //, title_callback.id()
                 });
                 
                 // set up input... probably needs recursion?
                 // this.appendInput('from', Blockly.INPUT_VALUE, 'PARENT', Selection);
+                /*
                 _.map(input_list, function(input_callback){
-                    var input = that.appendInput(
+                    that.appendValueInput(
                         Blockly[input_callback.shape()],
                         input_callback.id(),
                         input_callback.output()
                     );
                     input.appendTitle(input_callback.title());
                 });
+                */
                 
             }
         };
@@ -482,7 +487,8 @@ b4.block = function(value){
         // this is the trickiest bit, to avoid scope leakage
         var BG = Blockly.Generator.get(block.generator());
         
-        b4.DEBUG ? console.log("generator installing", blid) : "";
+        b4.DEBUG || console.log("generator installing", blid);
+        
         BG[blid] = function(){
             code = block.generateCode(this, BG);
             return code;
