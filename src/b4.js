@@ -375,32 +375,55 @@ b4.block = function(value){
     Blockly.Python.ORDER_NONE = 99;             // (...)
     */
     _inherit("_code_order", "codeOrder");
-    
-    block.generateCode = function(blockly_scope, generator){
-        var BG = Blockly.Generator.get(block.generator()),
-                fake_block = function(){
-                var flock = function(attr){ return flock; };
-            
-                flock.title = function(value){
-                    return blockly_scope.getTitleValue(value);
-                };
-            
-                flock.code = function(value){
-                    return BG.valueToCode(blockly_scope,
-                        value,
-                        block.codeOrder());
-                };
-            
-                return flock;
-            };
+
         
-        return [
-            _.template(
-                block.code(),
-                fake_block(),
-                {"variable": "$"}),
-            block.codeOrder() || generator.ORDER_ATOMIC
-        ]; 
+    /* Generate the equivalent of:
+    
+            Blockly.JavaScript.d3_lambda = function() {
+              var code = [
+                'function(',
+                this.getTitleValue('DATUM'),
+                ',',
+                this.getTitleValue('INDEX'),
+                '){\n  ',
+                Blockly.JavaScript.valueToCode(this, 'DO'),
+                '\n  return ',
+                Blockly.JavaScript.valueToCode(this, 'RETURN') || 'null',
+                ';\n}'
+              ].join('');
+              return [code, Blockly.JavaScript.ORDER_FUNCTION_CALL];
+            };
+            
+    */   
+    block.generateCode = function(blockly_scope, generator){
+        var order = block.codeOrder(), 
+            BG = Blockly.Generator.get(block.generator()),
+                fake_block = function(){
+                    var flock = function(attr){ return flock; };
+            
+                    flock.title = function(value){
+                        return blockly_scope.getTitleValue(value);
+                    };
+            
+                    flock.code = function(value){
+                        var code = BG.valueToCode(
+                            blockly_scope,
+                            value,
+                            order
+                        );
+                        return code;
+                    };
+            
+                    return flock;
+                };
+        
+            order = undef(order) ? generator.ORDER_ATOMIC : order
+        var code_and_order = [
+            _.template(block.code(), fake_block(), {"variable": "$"}),
+            order
+        ];
+        
+        return code_and_order;
     };
 
     /*
@@ -437,7 +460,6 @@ b4.block = function(value){
             input_list = block.input();
         
         
-        b4.DEBUG || console.log("language installing", blid);
         
         BL[blid] = {
             category: block.category(),
@@ -465,17 +487,15 @@ b4.block = function(value){
                 
                 _.map(title_list, function(title_callback){
                     var title_item = title_callback();
-                    dummy_input.appendTitle(title_item);
-                    //, title_callback.id()
+                    dummy_input.appendTitle(
+                        title_item,
+                        title_callback.id()
+                    );
                 });
                 
                 // set up input... probably needs recursion?
                 // this.appendInput('from', Blockly.INPUT_VALUE, 'PARENT', Selection);
                 _.map(input_list, function(input_callback){
-                    b4.DEBUG || console.log(
-                        input_callback.title(),
-                        input_callback.output()
-                    );
                     var output = input_callback.output(),
                         shape_meth = {
                                     INPUT_VALUE: that.appendValueInput,
@@ -494,8 +514,6 @@ b4.block = function(value){
         
         // this is the trickiest bit, to avoid scope leakage
         var BG = Blockly.Generator.get(block.generator());
-        
-        b4.DEBUG || console.log("generator installing", blid);
         
         BG[blid] = function(){
             code = block.generateCode(this, BG);
