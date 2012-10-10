@@ -407,6 +407,7 @@ b4.block = function(value){
     whether inputs should be displayed inline
     */
     _inherit("_inline", "inputsInline");
+    
 
     /*
     write the block to the generator and language!
@@ -471,12 +472,19 @@ b4.block = function(value){
                 // set up input... probably needs recursion?
                 // this.appendInput('from', Blockly.INPUT_VALUE, 'PARENT', Selection);
                 _.map(input_list, function(input_callback){
-                    that.appendValueInput(
-                        Blockly[input_callback.shape()],
-                        input_callback.id(),
+                    b4.DEBUG || console.log(
+                        input_callback.title(),
                         input_callback.output()
                     );
-                    input.appendTitle(input_callback.title());
+                    var shape_meth = {
+                                INPUT_VALUE: that.appendValueInput,
+                                DUMMY_VALUE: that.appendDummyInput,
+                                NEXT_STATEMENT: that.appendStatementInput
+                        }[input_callback.shape()],
+                        input = shape_meth.call(that, input_callback.id());
+
+                    
+                    //input.appendTitle(input_callback.title());
                 });
                 
             }
