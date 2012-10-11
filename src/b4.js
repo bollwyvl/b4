@@ -12,7 +12,7 @@ convenience functions
 */
 var undef = b4.undef = function(value){
     return _.isUndefined(value);
-}
+};
 
 
 b4.VERSION = "0.1";
@@ -418,7 +418,7 @@ b4.block = function(value){
                     return flock;
                 };
         
-            order = undef(order) ? generator.ORDER_ATOMIC : order
+            order = undef(order) ? generator.ORDER_ATOMIC : order;
         var code_and_order = [
             _.template(block.code(), fake_block(), {"variable": "$"}),
             order
@@ -473,13 +473,17 @@ b4.block = function(value){
                     if(undef(val)){ return; }
                     
                     var maybe_bool = _.contains([
-                            "setOutput",
                             "setPreviousStatement",
-                            "setNextStatement"
+                            "setNextStatement",
+                            "setOutput"
                         ], func);
                     
                     if(maybe_bool && (val !== true && val !== false)){
-                        that[func](true, val);
+                        if(val.id && val.field){
+                            that[func](true, val.id);
+                        }else{
+                            that[func](true, val);
+                        }
                     }else{
                         that[func](val);
                     }
@@ -487,27 +491,37 @@ b4.block = function(value){
                 
                 
                 _.map(title_list, function(title_callback){
-                    var title_item = title_callback();
+                    var title_item = title_callback(),
+                        title_value = title_item.field ? title_item.field() : title_item
+                        title_id = _.isFunction(title_callback.id) ? title_callback.id() : title_callback.id;
                     dummy_input.appendTitle(
-                        title_item,
-                        title_callback.id()
+                        title_value,
+                        title_id
                     );
                 });
                 
                 // set up input... probably needs recursion?
                 // this.appendInput('from', Blockly.INPUT_VALUE, 'PARENT', Selection);
-                _.map(input_list, function(input_callback){
-                    var output = input_callback.output(that),
+                _.map(input_list, function(input){
+                    input = input();
+                    var output = input.field.output(that),
                         shape_meth = {
                                     INPUT_VALUE: that.appendValueInput,
                                     DUMMY_VALUE: that.appendDummyInput,
                                     NEXT_STATEMENT: that.appendStatementInput
-                            }[input_callback.shape()],
-                        input = shape_meth.call(that, input_callback.id());
+                            }[input.field.shape()],
+                        
+                        // calling, setting the type
+                        blockly_input = shape_meth.call(that, output.id());
+                        
+                        console.log("\t\tappended", shape_meth, output.id());
+                        
                         if(!undef(output)){
-                            input.setCheck(output);
+                            console.log("\t\tcheck", input.id);
+                            blockly_input.setCheck(true,
+                                input.id !== true ? input.id : undefined);
                         }
-                        input.appendTitle(input_callback.title());
+                        blockly_input.appendTitle(input.field.title());
                 });
                 
             }
