@@ -519,8 +519,7 @@ b4.block = function(value){
                         if(!undef(output)){
                             var input_id = _.isFunction(input.id) ? input.id() : input.id;
                             console.log("\t\tcheck", input_id);
-                            blockly_input.setCheck(true,
-                                input_id !== true ? input_id : undefined);
+                            blockly_input.setCheck(input_id !== true ? input_id : undefined);
                         }
                         blockly_input.appendTitle(input.field.title());
                 });
