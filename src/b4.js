@@ -22,7 +22,7 @@ namespaced piles of b4 block objects
 */
 b4.library = b4.library || {};
 
-b4.DEBUG = 0;
+var DEBUG = b4.DEBUG = 0;
 
 /*
 create a new block, taking the above configuration into account

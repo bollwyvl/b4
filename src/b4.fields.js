@@ -1,5 +1,6 @@
 (function(b4){
-    var undef = b4.undef;
+    var undef = b4.undef,
+        DEBUG = b4.DEBUG;
 /*
     this.appendInput('from', Blockly.INPUT_VALUE, 'PARENT', Selection);
 */
