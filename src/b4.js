@@ -1,4 +1,6 @@
 (function (Blockly) {
+var VERSION = [0, 1, 0]; 
+
 // probably `document`
 var root = this;
 
@@ -15,7 +17,7 @@ var undef = b4.undef = function(value){
 };
 
 
-b4.VERSION = "0.1";
+b4.VERSION = VERSION.join(".");
 
 /*
 namespaced piles of b4 block objects
