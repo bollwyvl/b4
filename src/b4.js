@@ -514,8 +514,11 @@ b4.block = function(value){
                         // calling, setting the type
                         blockly_input = shape_meth.call(that, output.id());
                         
+                        b4.DEBUG && console.log("\t\tappended", shape_meth.name, output.id());
+                        
                         if(!undef(output)){
                             var input_id = _.isFunction(input.id) ? input.id() : input.id;
+                            b4.DEBUG && console.log("\t\tcheck", input_id);
                             blockly_input.setCheck(input_id !== true ? input_id : undefined);
                         }
                         blockly_input.appendTitle(input.field.title());
