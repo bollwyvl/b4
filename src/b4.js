@@ -412,7 +412,7 @@ b4.block = function(value){
                             value,
                             order
                         );
-                        return undef(_default) ? code : _default;
+                        return undef(code) && !undef(_default) ? _default : code;
                     };
             
                     return flock;
