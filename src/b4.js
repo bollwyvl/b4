@@ -478,8 +478,8 @@ b4.block = function(value){
                             "setOutput"
                         ], func);
                     
-                    if(maybe_bool && (val !== true && val !== false)){
-                        if(val.id && val.field){
+                    if(maybe_bool && (_.isNull(val) || (val !== true && val !== false))){
+                        if(!_.isNull(val) && val.id && val.field){
                             that[func](true, val.id);
                         }else{
                             that[func](true, val);
