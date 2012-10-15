@@ -1,4 +1,5 @@
-(function (Blockly) {
+(function (Blockly, _, Color) {
+"use strict";
 var VERSION = [0, 1, 0]; 
 
 // probably `document`
@@ -7,7 +8,12 @@ var root = this;
 /*
 global namespace
 */
-var b4 = function(){ return b4; };
+var b4 = root.b4 = function(){ return b4; };
+
+/*
+Input superclass
+*/
+b4.fields = function(){};
 
 /*
 convenience functions
@@ -219,7 +225,7 @@ b4.block = function(value){
             my._colour = value;
         }else{
             // ...or any CSS value
-            my._colour = Color(value).hue();
+            my._colour = new Color(value).hue();
         }
     });
 
@@ -494,7 +500,7 @@ b4.block = function(value){
                 
                 _.map(title_list, function(title_callback){
                     var title_item = title_callback(),
-                        title_value = title_item.field ? title_item.field() : title_item
+                        title_value = title_item.field ? title_item.field() : title_item,
                         title_id = _.isFunction(title_callback.id) ? title_callback.id() : title_callback.id;
                     dummy_input.appendTitle(
                         title_value,
@@ -544,11 +550,4 @@ b4.block = function(value){
     return block.id(value || "");
 };
 
-/*
-Input superclass
-*/
-b4.fields = function(){};
-
-// install it!
-root.b4 = b4;
-})(Blockly);
+}).call(this, Blockly, _, Color);

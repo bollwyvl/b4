@@ -1,4 +1,6 @@
 (function(b4){
+"use strict";
+
 b4.library.dev = {};
 
 var dev = b4.block()
@@ -25,4 +27,4 @@ b4.library.dev.console_log = dev.clone("console_log")
     .code("console.log(<%= $.title('ITEMS') %>)")
     .done();
         
-})(b4);
+}).call(this, b4);

@@ -1,4 +1,5 @@
 (function(b4){
+"use strict";
     var undef = b4.undef,
         DEBUG = b4.DEBUG;
 /*
