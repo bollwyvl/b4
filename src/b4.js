@@ -10,12 +10,6 @@ global namespace
 */
 var b4 = root.b4 = function(){ return b4; };
 
-var log = function(){
-    if(DEBUG){
-        root.console.log.call(arguments);
-    }
-};
-
 /*
 Input superclass
 */
@@ -36,7 +30,7 @@ namespaced piles of b4 block objects
 */
 b4.library = b4.library || {};
 
-var DEBUG = b4.DEBUG = 0;
+var DEBUG = b4.DEBUG = 1;
 
 /*
 create a new block, taking the above configuration into account
@@ -538,13 +532,10 @@ b4.block = function(value){
                         // calling, setting the type
                         blockly_input = shape_meth.call(that, output.id());
                         
-                        log("\t\tappended", shape_meth.name, output.id());
-                        
                         if(!undef(output)){
                             var input_id = _.isFunction(input.id) ?
                                 input.id() :
                                 input.id;
-                            log("\t\tcheck", input_id);
                             blockly_input.setCheck(input_id !== true ? input_id : undefined);
                         }
                         blockly_input.appendTitle(input.field.title());
