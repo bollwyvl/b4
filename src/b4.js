@@ -58,7 +58,8 @@ b4.block = function(value){
             _blocks: undefined,
             _code: undefined,
             _code_order: undefined,
-            _input: undefined
+            _input: undefined,
+            _parenthesize: undefined,
         },
         block = function(){};
 
@@ -299,7 +300,7 @@ b4.block = function(value){
                 new_title = function(blockly_scope){
                     return value;
                 };
-                new_title.id = function(){ return undefined; };
+                new_title.id = function(){ return value.id || undefined; };
             }
             my._title.push(new_title);
         });
@@ -384,6 +385,7 @@ b4.block = function(value){
     Blockly.Python.ORDER_NONE = 99;             // (...)
     */
     _inherit("_code_order", "codeOrder");
+    _inherit("_parenthesize", "parenthesize");
 
         
     /* Generate the equivalent of:
@@ -420,7 +422,15 @@ b4.block = function(value){
                             value,
                             order
                         );
-                        return undef(code) && !undef(_default) ? _default : code;
+                        if(undef(code)){
+                            return !undef(_default) ? _default : undefined;
+                        }else if(!undef(block.parenthesize()) 
+                                && code[0] == "("
+                                && code[code.length-1] == ")"){
+                            return code.slice(1, -1);
+                        }else{
+                            return code;
+                        }
                     };
             
                     return flock;

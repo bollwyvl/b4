@@ -1,4 +1,4 @@
-(function(b4){
+(function(b4, Blockly){
 "use strict";
     var undef = b4.undef,
         DEBUG = b4.DEBUG;
@@ -52,7 +52,7 @@ b4.fields.choices = function(value){
         };
     
     // TODO: make this less magic
-    field.shape = function(){return "INPUT_VALUE"};    
+    field.shape = function(){return "INPUT_VALUE";};    
     
     /*
     field id in this scope (block)
@@ -169,4 +169,4 @@ b4.input = function(value){
     
     return field.id(value || "");
 };
-})(b4);
+})(b4, Blockly);
