@@ -1,3 +1,4 @@
+/*jshint unused:false */
 (function(b4, Blockly){
 "use strict";
     var undef = b4.undef,

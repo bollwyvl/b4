@@ -1,6 +1,6 @@
 (function (Blockly, _, Color) {
 "use strict";
-var VERSION = [0, 1, 0]; 
+var VERSION = [0, 1, 0];
 
 // probably `document`
 var root = this;
@@ -9,6 +9,12 @@ var root = this;
 global namespace
 */
 var b4 = root.b4 = function(){ return b4; };
+
+var log = function(){
+    if(DEBUG){
+        root.console.log.call(arguments);
+    }
+};
 
 /*
 Input superclass
@@ -59,7 +65,7 @@ b4.block = function(value){
             _code: undefined,
             _code_order: undefined,
             _input: undefined,
-            _parenthesize: undefined,
+            _parenthesize: undefined
         },
         block = function(){};
 
@@ -424,9 +430,9 @@ b4.block = function(value){
                         );
                         if(undef(code)){
                             return !undef(_default) ? _default : undefined;
-                        }else if(!undef(block.parenthesize()) 
-                                && code[0] == "("
-                                && code[code.length-1] == ")"){
+                        }else if(!undef(block.parenthesize()) &&
+                                code[0] == "(" &&
+                                code[code.length-1] == ")"){
                             return code.slice(1, -1);
                         }else{
                             return code;
@@ -532,11 +538,13 @@ b4.block = function(value){
                         // calling, setting the type
                         blockly_input = shape_meth.call(that, output.id());
                         
-                        b4.DEBUG && console.log("\t\tappended", shape_meth.name, output.id());
+                        log("\t\tappended", shape_meth.name, output.id());
                         
                         if(!undef(output)){
-                            var input_id = _.isFunction(input.id) ? input.id() : input.id;
-                            b4.DEBUG && console.log("\t\tcheck", input_id);
+                            var input_id = _.isFunction(input.id) ?
+                                input.id() :
+                                input.id;
+                            log("\t\tcheck", input_id);
                             blockly_input.setCheck(input_id !== true ? input_id : undefined);
                         }
                         blockly_input.appendTitle(input.field.title());
