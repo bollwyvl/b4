@@ -16,6 +16,11 @@ Input superclass
 b4.fields = function(){};
 
 /*
+Space for b4 users to do interesting things
+*/
+b4.plugins = {};
+
+/*
 convenience functions
 */
 var undef = b4.undef = function(value){
