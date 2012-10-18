@@ -94,6 +94,39 @@ b4.fields.choices = function(value){
     return field.id(value || "");
 };
 
+b4.fields.variable = function(value){
+    var field = function(blockly_scope){
+            var _field =  new Blockly.FieldVariable(field.init());
+            return _field;
+        },
+        my = {
+            _init: undefined,
+            _id: undefined
+        };
+    
+    field.variable = true;
+    
+    /*
+    field id in this scope (block)
+    */
+    field.id = function(value){
+        if(undef(value)) return my._id;
+        my._id = value;
+        return field;
+    };
+    
+    /*
+    the initial value for a field
+    */
+    field.init = function(value){
+        if(undef(value)) return my._init;
+        my._init = value;
+        return field;
+    };
+    
+    return field.id(value || "");
+};
+
 b4.input = function(value){
     var field = function(blockly_scope){
             return field;

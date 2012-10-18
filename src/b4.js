@@ -481,7 +481,15 @@ b4.block = function(value){
                 setInputsInline: block.inputsInline()
             },
             title_list = block.title(),
-            input_list = block.input();
+            input_list = block.input(),
+            variables_list = _(title_list).chain()
+                .filter(function(_var){
+                    return _var().field && _var().field.variable;
+                })
+                .map(function(_var){
+                    return _var().field.id();
+                })
+                .value();
         
         
         
@@ -512,11 +520,19 @@ b4.block = function(value){
                     }
                 });
                 
-                
+                /*
+                Set up titles
+                ... it seems a little weird to still be doing this after r477
+                */
                 _.map(title_list, function(title_callback){
                     var title_item = title_callback(),
                         title_value = title_item.field ? title_item.field() : title_item,
                         title_id = _.isFunction(title_callback.id) ? title_callback.id() : title_callback.id;
+                    
+                    if(undef(title_id) && title_item.field){
+                        title_id = title_item.field.id();
+                    }
+                    
                     dummy_input.appendTitle(
                         title_value,
                         title_id
@@ -548,6 +564,45 @@ b4.block = function(value){
                 
             }
         };
+        
+        
+        /*
+        Not sure if having these empty creates side effects...
+        
+        getVars: function() {
+          return [this.getTitleValue('VAR')];
+        },
+        renameVar: function(oldName, newName) {
+          if (Blockly.Names.equals(oldName, this.getTitleValue('VAR'))) {
+            this.setTitleValue(newName, 'VAR');
+          }
+        }
+        */
+        
+        
+        if(variables_list.length){
+            BL[blid].getVars = function(){
+                var that = this;
+                
+                return _(variables_list).map(function(var_id){
+                    return that.getTitleValue(var_id);
+                });
+            };
+            BL[blid].renameVar = function(old_name, new_name){
+                var that = this;
+                /*
+                if (Blockly.Names.equals(oldName, this.getTitleValue('VAR'))) {
+                  this.setTitleValue(newName, 'VAR');
+                }
+                */
+                _(variables_list).map(function(var_id){
+                    if (Blockly.Names.equals(old_name,
+                        that.getTitleValue(var_id))) {
+                            that.setTitleValue(new_name, var_id);
+                        }
+                    });
+            };
+        }
         
         // this is the trickiest bit, to avoid scope leakage
         var BG = Blockly.Generator.get(block.generator());
