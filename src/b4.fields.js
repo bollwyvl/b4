@@ -33,6 +33,24 @@ b4.fields.text = function(value){
         my._init = value;
         return field;
     };
+
+    /*
+    field id in this scope (block)
+    */
+    field.title = function(value){
+        if(undef(value)) return my._title;
+        my._title = value;
+        return field;
+    };
+
+    /*
+    field id in this scope (block)
+    */
+    field.output = function(value){
+        if(undef(value)) return my._output;
+        my._output = value;
+        return field;
+    };
     
     return field.id(value || "");
 };

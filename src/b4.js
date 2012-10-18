@@ -482,7 +482,9 @@ b4.block = function(value){
             },
             title_list = block.title(),
             input_list = block.input(),
-            variables_list = _(title_list).chain()
+            variables_list = [];
+            /*
+            _(title_list).chain()
                 .filter(function(_var){
                     return _var().field && _var().field.variable;
                 })
@@ -490,6 +492,7 @@ b4.block = function(value){
                     return _var().field.id();
                 })
                 .value();
+            */
         
         
         
@@ -531,6 +534,9 @@ b4.block = function(value){
                     
                     if(undef(title_id) && title_item.field){
                         title_id = title_item.field.id();
+                    }
+                    if(title_item.field && title_item.field.variable){
+                        variables_list.push(title_item.field.variable);
                     }
                     
                     dummy_input.appendTitle(
