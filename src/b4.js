@@ -418,7 +418,11 @@ b4.block = function(value){
                     var flock = function(attr){ return flock; };
             
                     flock.title = function(value){
-                        return blockly_scope.getTitleValue(value);
+                        try{
+                            return blockly_scope.getTitleValue(value);
+                        }catch(err){
+                            return "";
+                        }
                     };
             
                     flock.code = function(value, _default){
